@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Y.A.S.H. AI</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: radial-gradient(ellipse at top, #102746, #050914 55%, #010308);
+  color: #eef8ff;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  text-align: center;
+  padding: 24px 12px;
+  background: linear-gradient(#0c1c31, #050912);
+  border-bottom: 1px solid #168dff;
+  box-shadow: 0 5px 28px #007bff25;
+}
+
+.logo {
+  width: 115px;
+  height: 115px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid #8bdcff;
+  box-shadow: 0 0 25px #008cff70;
+}
+
+h1 {
+  margin: 14px 0 6px;
+  font-size: 30px;
+  letter-spacing: 6px;
+  text-shadow: 0 0 15px #008cff;
+}
+
+.subtitle {
+  color: #86cfff;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+.status {
+  margin-top: 14px;
+  color: #65ffd1;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.container {
+  width: 92%;
+  max-width: 650px;
+  margin: 20px auto;
+}
+
+.panel {
+  padding: 16px;
+  margin-bottom: 16px;
+  background: linear-gradient(145deg, #101e31, #070c16);
+  border: 1px solid #24517c;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px #000;
+}
+
+h2 {
+  margin-top: 0;
+  color: #83d9ff;
+  font-size: 15px;
+  letter-spacing: 2px;
+}
+
+#chat {
+  height: 240px;
+  overflow-y: auto;
+  background: #030812;
+  border: 1px solid #21466b;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.message {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+  font-size: 14px;
+  padding: 11px;
+  border-radius: 9px;
+  margin-bottom: 9px;
+}
+
+.bot {
+  background: #10243a;
+  border-left: 3px solid #31d9ff;
+}
+
+.user {
+  background: #12385b;
+  border-left: 3px solid #70aaff;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border-radius: 9px;
+  border: 1px solid #28699d;
+  background: #050c18;
+  color: white;
+  outline: none;
+  font-size: 15px;
+}
+
+button, .upload-label {
+  display: inline-block;
+  padding: 12px 14px;
+  margin: 7px 4px 0 0;
+  background: linear-gradient(145deg, #153c61, #09172a);
+  border: 1px solid #287db9;
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button.primary {
+  background: linear-gradient(135deg, #b9f0ff, #258fdf);
+  color: #03101c;
+  font-weight: bold;
+}
+
+button:active, .upload-label:active {
+  background: #1765a0;
+}
+
+.small {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #a8c3dc;
+}
+
+#photoPreview {
+  display: none;
+  width: 100%;
+  max-height: 350px;
+  object-fit: contain;
+  margin-top: 14px;
+  background: #000;
+  border: 1px solid #38baff;
+  border-radius: 10px;
+}
+
+#photoInfo, #notice {
+  color: #77d9ff;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+
+input[type="file"] { display: none; }
+
+footer {
+  padding: 22px 10px;
+  text-align: center;
+  color: #9daebe;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+/* LOADING SCREEN */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: radial-gradient(circle, #102b49, #050d19 55%, #010308);
+  transition: opacity .6s ease, visibility .6s ease;
+}
+
+#loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.core {
+  width: 125px;
+  height: 125px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #7ce8ff;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #008cff80, inset 0 0 20px #008cff50;
+  animation: rotateCore 3s linear infinite;
+}
+
+.core span {
+  font-size: 40px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 0 20px #00aaff;
+}
+
+.loader-title {
+  margin-top: 25px;
+  font-size: 32px;
+  letter-spacing: 7px;
+}
+
+#progressTrack {
+  width: 230px;
+  height: 3px;
+  margin-top: 20px;
+  background: #19334c;
+}
+
+#progress {
+  width: 0%;
+  height: 100%;
+  background: #8feaff;
+  box-shadow: 0 0 12px #00aaff;
+}
+
+#loadStatus {
+  color: #b9eaff;
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+@keyframes rotateCore {
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div id="loader">
+  <div class="core"><span>Y</span></div>
+  <div class="loader-title">Y.A.S.H.</div>
+  <p class="subtitle">YOUR ADVANCED SMART HELPER</p>
+  <div id="progressTrack"><div id="progress"></div></div>
+  <p id="loadStatus">INITIALIZING SYSTEM...</p>
+  <p class="small">MADE BY YASH KULSHRESTHA</p>
+</div>
+
+<header>
+  <img src="yash-logo.png" alt="Y.A.S.H. Logo"
+       class="logo" onerror="this.style.display='none'">
+  <h1>Y.A.S.H.</h1>
+  <div class="subtitle">YOUR ADVANCED SMART HELPER</div>
+  <div class="status">● SYSTEM ONLINE</div>
+</header>
+
+<main class="container">
+
+  <section class="panel">
+    <h2>◈ COMMAND CENTER</h2>
+
+    <div id="chat" aria-live="polite">
+      <div class="message bot">
+        Y.A.S.H. is ready!
+        Try typing Hello, Time, Date, Help, or Calculate 25 * 4.
+      </div>
+    </div>
+
+    <input id="command" type="text"
+           placeholder="Type your command..."
+           autocomplete="off">
+
+    <button class="primary" id="sendBtn">➤ SEND</button>
+    <button id="voiceBtn">🎙 SPEAK</button>
+    <button id="repeatBtn">🔊 REPEAT</button>
+    <button id="clearBtn">✕ CLEAR CHAT</button>
+    <p id="notice"></p>
+  </section>
+
+  <section class="panel">
+    <h2>◈ VISION MODULE</h2>
+    <p class="small">
+      Take a photo or select one from your Gallery.
+      This demo previews images but does not understand their contents.
+    </p>
+
+    <label class="upload-label" for="galleryInput">🖼 GALLERY</label>
+    <input id="galleryInput" type="file" accept="image/*">
+
+    <label class="upload-label" for="cameraInput">📷 CAMERA</label>
+    <input id="cameraInput" type="file"
+           accept="image/*" capture="environment">
+
+    <img id="photoPreview" alt="Selected photo">
+    <p id="photoInfo">No photo selected.</p>
+    <button id="photoHelp">PHOTO AI STATUS</button>
+    <button id="removePhoto">REMOVE PHOTO</button>
+  </section>
+
+  <section class="panel">
+    <h2>◈ QUICK COMMANDS</h2>
+    <p class="small">
+      Hello — Greeting<br>
+      Your name — Assistant identity<br>
+      Time — Current device time<br>
+      Date — Today's date<br>
+      Calculate 25 * 4 — Calculator<br>
+      Study tips — Study advice<br>
+      Help — Available commands
+    </p>
+  </section>
+
+</main>
+
+<footer>MADE BY YASH KULSHRESTHA</footer>
+
+<script>
+const chat = document.getElementById("chat");
+const input = document.getElementById("command");
+const notice = document.getElementById("notice");
+
+let lastReply = "";
+let photoURL = null;
+
+function addMessage(text, type) {
+  const div = document.createElement("div");
+  div.className = "message " + type;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function speak(text) {
+  if (!("speechSynthesis" in window) ||
+      !("SpeechSynthesisUtterance" in window)) {
+    notice.textContent =
+      "Speech output unavailable in this browser. Text replies still work.";
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-IN";
+  utterance.rate = 0.95;
+
+  utterance.onerror = function() {
+    notice.textContent =
+      "Speech could not play. Check your phone's text-to-speech settings.";
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
+function reply(text) {
+  lastReply = text;
+  addMessage("Y.A.S.H.: " + text, "bot");
+
+  try {
+    speak(text);
+  } catch (error) {
+    console.error("Speech error:", error);
+  }
+}
+
+function calculate(text) {
+  const match = text.match(
+    /(?:calculate|what is|solve)?\s*(-?\d+(?:\.\d+)?)\s*([+\-*x/])\s*(-?\d+(?:\.\d+)?)/i
+  );
+
+  if (!match) return null;
+
+  const a = Number(match[1]);
+  const b = Number(match[3]);
+  const op = match[2].toLowerCase();
+
+  if (op === "+") return "Answer: " + (a + b);
+  if (op === "-") return "Answer: " + (a - b);
+  if (op === "*" || op === "x") return "Answer: " + (a * b);
+  if (op === "/") {
+    return b === 0
+      ? "Division by zero is not possible."
+      : "Answer: " + (a / b);
+  }
+
+  return null;
+}
+
+function processCommand() {
+  const raw = input.value.trim();
+  if (!raw) {
+    notice.textContent = "Please type a command first.";
+    return;
+  }
+
+  notice.textContent = "";
+  addMessage("YOU: " + raw, "user");
+  input.value = "";
+
+  const text = raw.toLowerCase();
+  let answer = calculate(text);
+
+  if (answer === null) {
+    if (/\b(hello|hi|hey)\b/.test(text)) {
+      answer = "Hello! I am Y.A.S.H. How can I help you?";
+    } else if (text.includes("your name") || text.includes("who are you")) {
+      answer = "I am Y.A.S.H., Your Advanced Smart Helper.";
+    } else if (text.includes("who created you") || text.includes("creator")) {
+      answer = "I was created as a personal assistant project by Yash Kulshrestha.";
+    } else if (text.includes("time")) {
+      answer = "Current time: " + new Date().toLocaleTimeString();
+    } else if (text.includes("date") || text.includes("today")) {
+      answer = "Today's date: " + new Date().toLocaleDateString();
+    } else if (text.includes("study")) {
+      answer = "Study one topic for 25 minutes, then practise questions. Tell me the subject for specific help.";
+    } else if (text.includes("photo") || text.includes("image")) {
+      answer = "Use the Vision Module to select a photo. AI image understanding is not connected yet.";
+    } else if (text.includes("thank")) {
+      answer = "You're welcome!";
+    } else if (text.includes("help")) {
+      answer = "Try Hello, Your Name, Time, Date, Study Tips, or Calculate 25 * 4.";
+    } else {
+      answer = "I don't know that command yet. Type Help to see available commands.";
+    }
+  }
+
+  reply(answer);
+}
+
+document.getElementById("sendBtn").addEventListener("click", processCommand);
+
+input.addEventListener("keydown", function(event) {
+  if (event.key === "Enter") processCommand();
+});
+
+document.getElementById("repeatBtn").addEventListener("click", function() {
+  if (lastReply) speak(lastReply);
+  else reply("Hello! I am Y.A.S.H.");
+});
+
+document.getElementById("clearBtn").addEventListener("click", function() {
+  chat.replaceChildren();
+  addMessage("Chat cleared. Y.A.S.H. is ready.", "bot");
+  lastReply = "";
+  notice.textContent = "";
+});
+
+document.getElementById("voiceBtn").addEventListener("click", function() {
+  const Recognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  if (!Recognition) {
+    notice.textContent =
+      "Voice input is unavailable in this browser. Type your command instead.";
+    return;
+  }
+
+  const recognition = new Recognition();
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+
+  notice.textContent = "Listening...";
+
+  recognition.onresult = function(event) {
+    input.value = event.results[0][0].transcript;
+    notice.textContent = "";
+    processCommand();
+  };
+
+  recognition.onerror = function() {
+    notice.textContent = "Could not hear you. Try again or type.";
+  };
+
+  recognition.onend = function() {
+    if (notice.textContent === "Listening...") notice.textContent = "";
+  };
+
+  recognition.start();
+});
+
+function loadPhoto(file) {
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    document.getElementById("photoInfo").textContent =
+      "Please choose an image file.";
+    return;
+  }
+
+  if (photoURL) URL.revokeObjectURL(photoURL);
+  photoURL = URL.createObjectURL(file);
+
+  const preview = document.getElementById("photoPreview");
+  preview.src = photoURL;
+  preview.style.display = "block";
+
+  document.getElementById("photoInfo").textContent =
+    "Photo selected: " + file.name +
+    ". Local preview ready; AI vision is not connected.";
+}
+
+document.getElementById("galleryInput").addEventListener("change", function() {
+  loadPhoto(this.files[0]);
+  this.value = "";
+});
+
+document.getElementById("cameraInput").addEventListener("change", function() {
+  loadPhoto(this.files[0]);
+  this.value = "";
+});
+
+document.getElementById("photoHelp").addEventListener("click", function() {
+  if (!photoURL) {
+    reply("Please select or take a photo first.");
+  } else {
+    reply("Your photo is displayed. To understand the image, a vision AI service must be connected. This demo has not uploaded your image.");
+  }
+});
+
+document.getElementById("removePhoto").addEventListener("click", function() {
+  document.getElementById("photoPreview").removeAttribute("src");
+  document.getElementById("photoPreview").style.display = "none";
+
+  if (photoURL) URL.revokeObjectURL(photoURL);
+  photoURL = null;
+
+  document.getElementById("photoInfo").textContent = "No photo selected.";
+});
+
+/* STARTUP ANIMATION */
+(function() {
+  const loader = document.getElementById("loader");
+  const progress = document.getElementById("progress");
+  const loadStatus = document.getElementById("loadStatus");
+
+  const messages = [
+    "INITIALIZING SYSTEM...",
+    "STARTING INTERFACE...",
+    "CALIBRATING MODULES...",
+    "Y.A.S.H. IS READY."
+  ];
+
+  let value = 0;
+
+  const timer = setInterval(function() {
+    value = Math.min(value + 4, 100);
+    progress.style.width = value + "%";
+
+    loadStatus.textContent = messages[
+      Math.min(Math.floor(value / 26), messages.length - 1)
+    ];
+
+    if (value >= 100) {
+      clearInterval(timer);
+      setTimeout(function() {
+        loader.classList.add("hidden");
+      }, 300);
+    }
+  }, 60);
+})();
+</script>
+
+</body>
+</html>
