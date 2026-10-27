@@ -393,7 +393,7 @@ function calculate(text) {
   return null;
 }
 
-function processCommand() {
+async function processCommand() {
   const raw = input.value.trim();
   if (!raw) {
     notice.textContent = "Please type a command first.";
