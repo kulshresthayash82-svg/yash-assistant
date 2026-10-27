@@ -427,11 +427,27 @@ function processCommand() {
     } else if (text.includes("help")) {
       answer = "Try Hello, Your Name, Time, Date, Study Tips, or Calculate 25 * 4.";
     } else {
-      answer = "I don't know that command yet. Type Help to see available commands.";
-    }
-  }
+  try {
+    const response = await fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: raw })
+    });
 
-  reply(answer);
+    const data = await response.json();
+
+    answer = response.ok
+      ? data.reply
+      : "AI error: " + (data.error || "Please try again.");
+  } catch (error) {
+    answer = "Could not connect to AI. Please try again.";
+  }
+}
+}
+reply(answer);
+  }
 }
 
 document.getElementById("sendBtn").addEventListener("click", processCommand);
