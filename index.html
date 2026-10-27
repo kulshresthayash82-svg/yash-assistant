@@ -395,6 +395,7 @@ function calculate(text) {
 
 async function processCommand() {
   const raw = input.value.trim();
+
   if (!raw) {
     notice.textContent = "Please type a command first.";
     return;
@@ -413,41 +414,36 @@ async function processCommand() {
     } else if (text.includes("your name") || text.includes("who are you")) {
       answer = "I am Y.A.S.H., Your Advanced Smart Helper.";
     } else if (text.includes("who created you") || text.includes("creator")) {
-      answer = "I was created as a personal assistant project by Yash Kulshrestha.";
+      answer = "I was created by Yash Kulshrestha.";
     } else if (text.includes("time")) {
       answer = "Current time: " + new Date().toLocaleTimeString();
     } else if (text.includes("date") || text.includes("today")) {
       answer = "Today's date: " + new Date().toLocaleDateString();
-    } else if (text.includes("study")) {
-      answer = "Study one topic for 25 minutes, then practise questions. Tell me the subject for specific help.";
-    } else if (text.includes("photo") || text.includes("image")) {
-      answer = "Use the Vision Module to select a photo. AI image understanding is not connected yet.";
     } else if (text.includes("thank")) {
       answer = "You're welcome!";
-    } else if (text.includes("help")) {
-      answer = "Try Hello, Your Name, Time, Date, Study Tips, or Calculate 25 * 4.";
     } else {
-  try {
-    const response = await fetch("/.netlify/functions/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: raw })
-    });
+      try {
+        const response = await fetch("/.netlify/functions/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: raw })
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    answer = response.ok
-      ? data.reply
-      : "AI error: " + (data.error || "Please try again.");
-  } catch (error) {
-    answer = "Could not connect to AI. Please try again.";
+        answer = response.ok && data.reply
+          ? data.reply
+          : "AI error: " + (data.error || "Please try again.");
+      } catch (error) {
+        answer = "Could not connect to AI. Please try again.";
+      }
+    }
   }
+
+  reply(answer);
 }
-}
-reply(answer);
-  }
 
 
 document.getElementById("sendBtn").addEventListener("click", processCommand);
